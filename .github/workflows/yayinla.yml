@@ -1,11 +1,12 @@
-# "v1.2.3" gibi bir etiket itilince Windows kurulum dosyasını derler ve bu deponun Release'lerine yükler.
-# Kurulu uygulamalar yeni sürümü buradan bulup kendini günceller (guncelleme.js).
-# Sürüm numarası package.json'daki "version" ile aynı olmalı.
+# package.json'daki "version" değişip main'e gönderilince (ya da Actions'tan elle çalıştırılınca) Windows kurulum
+# dosyasını derler ve bu deponun Release'lerine "v<sürüm>" olarak yükler. Kurulu uygulamalar yeni sürümü buradan
+# bulup kendini günceller (guncelleme.js).
 name: Yayınla
 
 on:
   push:
-    tags: ["v*"]
+    branches: [main]
+    paths: ["package.json"]
   workflow_dispatch:
 
 permissions:
@@ -20,7 +21,20 @@ jobs:
         with:
           node-version: 22
           cache: npm
+      - name: Sürüm etiketi
+        id: surum
+        shell: bash
+        run: |
+          v="v$(node -p "require('./package.json').version")"
+          echo "etiket=$v" >> "$GITHUB_OUTPUT"
+          if git ls-remote --exit-code --tags origin "refs/tags/$v" >/dev/null; then
+            echo "yeni=hayir" >> "$GITHUB_OUTPUT"; echo "$v zaten yayınlanmış, atlanıyor."
+          else
+            git tag "$v" && git push origin "$v" && echo "yeni=evet" >> "$GITHUB_OUTPUT"
+          fi
       - run: npm ci
+        if: steps.surum.outputs.yeni == 'evet'
       - run: npm run yayinla
+        if: steps.surum.outputs.yeni == 'evet'
         env:
           GH_TOKEN: ${{ github.token }}

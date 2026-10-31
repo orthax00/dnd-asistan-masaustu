@@ -29,9 +29,8 @@ npm run dist                                     # dist/DnD-Asistani-Kurulum-x.y
 
 ## Yeni sürüm yayınlama
 
-1. `package.json` içindeki `version`'ı artır (ör. 1.3.0 → 1.4.0) ve gönder.
-2. Aynı numarayla bir etiket it: `git tag v1.4.0 && git push origin v1.4.0`.
-3. "Yayınla" iş akışı Windows'ta derleyip Release'e yükler. Kurulu uygulamalar açılışta (ve 4 saatte bir) yeni sürümü
-   görür, arka planda indirir ve "Yeniden başlat ve güncelle" diye sorar.
+1. `package.json` içindeki `version`'ı artır (ör. 1.3.0 → 1.4.0) ve main'e gönder.
+2. "Yayınla" iş akışı `v1.4.0` etiketini açar, Windows'ta derler ve Release'e yükler. Kurulu uygulamalar açılışta
+   (ve 4 saatte bir) yeni sürümü görür, arka planda indirir ve "Yeniden başlat ve güncelle" diye sorar.
 
 İndirme linki (arkadaşlar için): https://github.com/orthax00/dnd-asistan-masaustu/releases/latest
