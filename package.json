@@ -1,0 +1,71 @@
+{
+  "name": "dnd-asistani",
+  "productName": "DnD Asistanı",
+  "version": "1.3.0",
+  "description": "DnD Asistanı masaüstü uygulaması",
+  "author": "orthax00",
+  "private": true,
+  "type": "commonjs",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win nsis --publish never",
+    "yayinla": "electron-builder --win nsis --publish always"
+  },
+  "devDependencies": {
+    "electron": "^45.2.1",
+    "electron-builder": "^26.0.0"
+  },
+  "build": {
+    "appId": "com.orthax00.dndasistani",
+    "productName": "DnD Asistanı",
+    "artifactName": "DnD-Asistani-Kurulum-${version}.${ext}",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "onbellek.js",
+      "cevrimdisi.js",
+      "yukleniyor.html",
+      "cevrimdisi.html",
+      "cevrimdisi-goruntuleyici.js",
+      "build/icon.png",
+      "guncelleme.js"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "build/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "DnD Asistanı",
+      "installerLanguages": [
+        "tr_TR"
+      ],
+      "language": "1055"
+    },
+    "protocols": [
+      {
+        "name": "DnD Asistanı giriş",
+        "schemes": [
+          "dndasistani"
+        ]
+      }
+    ],
+    "publish": {
+      "provider": "github",
+      "owner": "orthax00",
+      "repo": "dnd-asistan-masaustu",
+      "releaseType": "release"
+    }
+  },
+  "dependencies": {
+    "electron-updater": "^6.8.11"
+  }
+}

@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src 'self'" />
+    <title>DnD Asistanı</title>
+    <style>
+      html, body { height: 100%; margin: 0; }
+      body {
+        display: flex; align-items: center; justify-content: center;
+        background: radial-gradient(circle at 50% 35%, #3a2a1e, #1c1410 70%);
+        color: #f3e2bd; font-family: Georgia, "Times New Roman", serif;
+      }
+      .kart {
+        max-width: 460px; padding: 32px 36px; text-align: center;
+        border: 2px solid #b8924a; border-radius: 10px; background: rgba(28, 20, 16, 0.85);
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+      }
+      img { width: 72px; height: 72px; }
+      h1 { margin: 12px 0 8px; font-size: 24px; letter-spacing: 0.04em; color: #e2bd6e; }
+      p { margin: 8px 0; line-height: 1.5; }
+      small { display: block; margin-top: 10px; color: #b9a582; word-break: break-all; }
+      button {
+        margin-top: 18px; padding: 10px 26px; font: inherit; font-size: 16px; cursor: pointer;
+        color: #fbe6b4; background: #8e2219; border: 2px solid #e2bd6e; border-radius: 6px;
+      }
+      button:hover { background: #a8301f; }
+      #cevrimdisi { margin-top: 22px; padding-top: 14px; border-top: 1px solid #5a4330; }
+      #oku { background: #3a2a1e; border-color: #b8924a; }
+    </style>
+  </head>
+  <body>
+    <div class="kart">
+      <img src="build/icon.png" alt="" />
+      <h1>Masaya ulaşılamadı</h1>
+      <p>DnD Asistanı sunucusuna bağlanamadı. İnternet bağlantını kontrol edip tekrar dene.</p>
+      <small id="ayrinti"></small>
+      <button id="tekrar">Tekrar dene</button>
+      <div id="cevrimdisi" hidden>
+        <p>İnternet yokken kayıtlı kampanyalarının karakter sayfalarını ve ansiklopedisini okuyabilirsin.</p>
+        <button id="oku">Çevrimdışı oku</button>
+      </div>
+    </div>
+    <script>
+      const q = new URLSearchParams(location.search);
+      document.getElementById("ayrinti").textContent = q.get("hata") || "";
+      const adres = q.get("adres");
+      document.getElementById("tekrar").onclick = () => adres && location.replace(adres);
+      // Bağlantı geri gelince kendiliğinden dener.
+      addEventListener("online", () => adres && location.replace(adres));
+      // 1.1.0+: kayıtlı çevrimdışı kopya varsa "Çevrimdışı oku" görünür.
+      window.dndMasaustu?.cevrimdisiListe?.().then((liste) => {
+        if (!liste.length) return;
+        document.getElementById("cevrimdisi").hidden = false;
+        document.getElementById("oku").onclick = () => location.assign("cevrimdisi.html");
+      });
+    </script>
+  </body>
+</html>
