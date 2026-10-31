@@ -6,6 +6,9 @@ const ONBELLEK_BOYUTU = 4 * 1024 * 1024 * 1024; // 4 GB; dolarsa en uzun süre a
 function kurOnbellek(app) {
   // Uygulama hazır olmadan verilmeli; sonradan değiştirilemez.
   app.commandLine.appendSwitch("disk-cache-size", String(ONBELLEK_BOYUTU));
+  // HDR açık ya da renk profili bozuk Windows ekranlarında Chromium renkleri soluk/beyazımsı gösterebiliyor.
+  // Renkleri standart sRGB'ye sabitleyince uygulama tarayıcıdaki gibi görünür.
+  app.commandLine.appendSwitch("force-color-profile", "srgb");
 }
 
 module.exports = { kurOnbellek, ONBELLEK_BOYUTU };
