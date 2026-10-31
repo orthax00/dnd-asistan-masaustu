@@ -34,7 +34,20 @@ jobs:
           fi
       - run: npm ci
         if: steps.surum.outputs.yeni == 'evet'
+      # Önce taslak Release: electron-builder dosyaları paralel yüklerken iki kez Release açmaya çalışmasın.
+      - name: Taslak Release
+        if: steps.surum.outputs.yeni == 'evet'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "${{ steps.surum.outputs.etiket }}" --draft --title "DnD Asistanı ${{ steps.surum.outputs.etiket }}" --notes "Windows kurulum dosyası. Kurulu uygulamalar bu sürüme kendiliğinden güncellenir."
       - run: npm run yayinla
         if: steps.surum.outputs.yeni == 'evet'
         env:
           GH_TOKEN: ${{ github.token }}
+      - name: Release'i yayınla
+        if: steps.surum.outputs.yeni == 'evet'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release edit "${{ steps.surum.outputs.etiket }}" --draft=false --latest
