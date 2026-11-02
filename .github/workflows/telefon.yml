@@ -29,7 +29,6 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
-      - uses: android-actions/setup-android@v3
       - run: npm ci
       - run: npx cap sync android
       # İmza anahtarı bir kez üretilir ve Actions önbelleğinde saklanır; böylece her APK aynı imzayla çıkar
