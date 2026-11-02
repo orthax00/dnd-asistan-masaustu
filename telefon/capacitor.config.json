@@ -1,0 +1,15 @@
+{
+  "appId": "com.orthax00.dndasistani",
+  "appName": "DnD Asistanı",
+  "webDir": "www",
+  "backgroundColor": "#1c1410",
+  "server": {
+    "url": "https://dnd-asistan.vercel.app",
+    "cleartext": false,
+    "allowNavigation": ["dnd-asistan.vercel.app", "*.supabase.co", "discord.com", "*.discord.com"]
+  },
+  "android": {
+    "appendUserAgent": "DnDAsistaniAndroid",
+    "allowMixedContent": false
+  }
+}

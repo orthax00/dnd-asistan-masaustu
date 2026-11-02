@@ -1,0 +1,12 @@
+{
+  "name": "dnd-asistani-telefon",
+  "version": "1.0.0",
+  "scripts": { "esitle": "cap sync android" },
+  "private": true,
+  "description": "DnD Asistanı Android uygulaması (siteyi saran Capacitor kabuğu)",
+  "dependencies": {
+    "@capacitor/android": "^8.6.0",
+    "@capacitor/cli": "^8.6.0",
+    "@capacitor/core": "^8.6.0"
+  }
+}

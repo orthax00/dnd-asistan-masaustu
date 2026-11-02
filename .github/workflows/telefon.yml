@@ -1,0 +1,63 @@
+# telefon/ klasörü main'e gönderilince (ya da elle çalıştırılınca) Android APK'yı derler ve
+# "telefon" etiketli Release'e yükler (her seferinde aynı adrese, eskisinin üstüne yazar).
+# Release "ön sürüm" işaretli: masaüstü uygulamasının otomatik güncellemesi "latest" Release'e bakar, karışmaz.
+name: Telefon
+
+on:
+  push:
+    branches: [main, claude/project-thread-g2rkoo]
+    paths: ["telefon/**", ".github/workflows/telefon.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: telefon
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: telefon/package-lock.json
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: android-actions/setup-android@v3
+      - run: npm ci
+      - run: npx cap sync android
+      # İmza anahtarı bir kez üretilir ve Actions önbelleğinde saklanır; böylece her APK aynı imzayla çıkar
+      # ve telefonda üstüne kurulabilir. (Önbellek 7 gün hiç kullanılmazsa silinir; o zaman yeni anahtar üretilir.)
+      - uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/anahtar
+          key: telefon-anahtar-v1
+      - name: İmza anahtarı
+        run: |
+          d="$RUNNER_TEMP/anahtar"; mkdir -p "$d"
+          if [ ! -f "$d/anahtar.jks" ]; then
+            openssl rand -hex 16 > "$d/sifre"
+            keytool -genkeypair -keystore "$d/anahtar.jks" -alias dnd -keyalg RSA -keysize 2048 -validity 36500 \
+              -storepass "$(cat "$d/sifre")" -keypass "$(cat "$d/sifre")" -dname "CN=DnD Asistani, O=orthax00"
+          fi
+          echo "ANAHTAR_DOSYASI=$d/anahtar.jks" >> "$GITHUB_ENV"
+          echo "ANAHTAR_SIFRESI=$(cat "$d/sifre")" >> "$GITHUB_ENV"
+      - name: APK derle
+        working-directory: telefon/android
+        env:
+          SURUM_KODU: ${{ github.run_number }}
+          SURUM_ADI: 1.0.${{ github.run_number }}
+        run: ./gradlew assembleRelease --no-daemon
+      - name: Release'e yükle
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp android/app/build/outputs/apk/release/app-release.apk DnD-Asistani.apk
+          gh release view telefon >/dev/null 2>&1 || gh release create telefon --prerelease --title "DnD Asistanı (Android)" --notes "Android APK. Telefonda DnD-Asistani.apk dosyasını indirip açın."
+          gh release upload telefon DnD-Asistani.apk --clobber
