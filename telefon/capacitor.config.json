@@ -1,15 +1,25 @@
 {
   "appId": "com.orthax00.dndasistani",
-  "appName": "DnD Asistanı",
+  "appName": "DnD Asistan\u0131",
   "webDir": "www",
   "backgroundColor": "#1c1410",
   "server": {
     "url": "https://dnd-asistan.vercel.app",
     "cleartext": false,
-    "allowNavigation": ["dnd-asistan.vercel.app", "*.supabase.co", "discord.com", "*.discord.com"]
+    "allowNavigation": [
+      "dnd-asistan.vercel.app",
+      "*.supabase.co",
+      "discord.com",
+      "*.discord.com"
+    ]
   },
   "android": {
     "appendUserAgent": "DnDAsistaniAndroid",
     "allowMixedContent": false
+  },
+  "ios": {
+    "appendUserAgent": "DnDAsistaniIOS",
+    "backgroundColor": "#1c1410",
+    "contentInset": "always"
   }
 }

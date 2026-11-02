@@ -61,3 +61,33 @@ jobs:
           cp android/app/build/outputs/apk/release/app-release.apk DnD-Asistani.apk
           gh release view telefon >/dev/null 2>&1 || gh release create telefon --prerelease --title "DnD Asistanı (Android)" --notes "Android APK. Telefonda DnD-Asistani.apk dosyasını indirip açın."
           gh release upload telefon DnD-Asistani.apk --clobber
+
+  ios:
+    # İmzasız IPA: Windows'ta Sideloadly / AltStore, ücretsiz Apple ID ile imzalayıp telefona kurar.
+    runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: telefon
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: telefon/package-lock.json
+      - run: npm ci
+      - run: npx cap sync ios
+      - name: IPA derle (imzasız)
+        run: |
+          xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Release -sdk iphoneos \
+            -destination 'generic/platform=iOS' -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            MARKETING_VERSION=1.0.${{ github.run_number }} CURRENT_PROJECT_VERSION=${{ github.run_number }} build
+          mkdir -p Payload && cp -R build/Build/Products/Release-iphoneos/App.app Payload/
+          zip -qr DnD-Asistani.ipa Payload
+      - name: Release'e yükle
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view telefon >/dev/null 2>&1 || gh release create telefon --prerelease --title "DnD Asistanı (telefon)" --notes "Android: DnD-Asistani.apk. iPhone: DnD-Asistani.ipa (Sideloadly/AltStore ile kurulur)."
+          gh release upload telefon DnD-Asistani.ipa --clobber
