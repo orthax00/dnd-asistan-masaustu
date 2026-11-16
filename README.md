@@ -18,6 +18,12 @@ Siteyi (https://dnd-asistan.vercel.app) adres çubuğu olmayan kendi penceresind
 
 Kısayollar: F11 tam ekran, F5 yenile, Alt+Sol/Sağ geri/ileri, Ctrl+= / Ctrl+- yakınlaştır, Alt menüyü gösterir.
 
+## Ses değiştirici (voice-changer/)
+
+Discord'da karakter sesleriyle RP için gerçek zamanlı ses değiştirici (Python). Şimdilik ayrı bir program olarak
+kurulur, kendi iş akışıyla derlenir (`.github/workflows/ses-degistirici.yml`) ve Electron kurulum dosyasına girmez.
+Uygulamayla ileride `127.0.0.1:47321` üzerindeki yerel API'den birleşecek. Ayrıntılar: [voice-changer/README.md](voice-changer/README.md).
+
 ## Geliştirme
 
 ```

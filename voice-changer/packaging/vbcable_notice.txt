@@ -1,0 +1,14 @@
+﻿DnD Voice Changer
+
+Bu program sesini değiştirip Discord'a "sanal mikrofon" üzerinden gönderir.
+Sanal mikrofon olarak VB-CABLE kullanılır.
+
+VB-CABLE, VB-Audio Software tarafından geliştirilen bağışla desteklenen
+(donationware) ücretsiz bir sürücüdür. Bu kurulum, resmi VB-CABLE paketini
+değiştirmeden içerir. Beğendiysen geliştiricisini destekleyebilirsin:
+https://vb-cable.com
+
+Kurulumdan sonra:
+1. Bilgisayarı yeniden başlat (VB-CABLE kurulduysa gerekli).
+2. DnD Voice Changer'ı aç, bir karakter seç, Başlat'a bas.
+3. Discord > Ses ve Görüntü > Giriş Aygıtı: "CABLE Output (VB-Audio Virtual Cable)".

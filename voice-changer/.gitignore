@@ -1,0 +1,7 @@
+.venv/
+.buildenv/
+build/
+dist/
+__pycache__/
+*.pyc
+presets.json

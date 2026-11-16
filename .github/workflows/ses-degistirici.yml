@@ -1,0 +1,73 @@
+# voice-changer/ klasörü değişince ses değiştiricinin Windows kurulum dosyasını derler (Actions > Artifacts).
+# "ses-v1.0.0" gibi bir etiket gönderilince kurulum dosyasını ön sürüm (prerelease) olarak yayınlar.
+# Ön sürüm ve make_latest:false sayesinde DnD Asistanı'nın otomatik güncellemesi (releases/latest) etkilenmez.
+name: Ses değiştirici
+
+on:
+  push:
+    branches: [main]
+    paths: ["voice-changer/**", ".github/workflows/ses-degistirici.yml"]
+    tags: ["ses-v*"]
+  pull_request:
+    paths: ["voice-changer/**", ".github/workflows/ses-degistirici.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+defaults:
+  run:
+    working-directory: voice-changer
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Bağımlılıklar
+        run: python -m pip install -r requirements.txt pyinstaller
+      - name: Testler
+        run: python -m unittest discover -s tests -v
+      - name: Exe (PyInstaller)
+        run: pyinstaller --noconfirm --distpath dist --workpath build\pyi packaging\voicechanger.spec
+      - name: Exe açılıyor mu
+        shell: pwsh
+        run: |
+          $p = Start-Process dist\DnDVoiceChanger\DnDVoiceChanger.exe -PassThru
+          Start-Sleep 10
+          if ($p.HasExited) { throw "Uygulama açılır açılmaz kapandı (kod $($p.ExitCode))" }
+          $r = Invoke-RestMethod http://127.0.0.1:47321/status
+          if ($r.presets.Count -lt 5) { throw "API karakter listesi boş" }
+          Write-Host "Açıldı; karakter sayısı: $($r.presets.Count)"
+          Stop-Process $p
+      - name: VB-CABLE resmi paketi
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force build\vbcable | Out-Null
+          Invoke-WebRequest https://download.vb-audio.com/Download_CABLE/VBCABLE_Driver_Pack46.zip -OutFile build\vbcable.zip
+          Expand-Archive -Force build\vbcable.zip build\vbcable
+          Get-ChildItem build\vbcable | Select-Object -First 5
+      - name: Inno Setup
+        shell: pwsh
+        run: |
+          $ver = if ("${{ github.ref_type }}" -eq "tag") { "${{ github.ref_name }}".Substring(5) } else { "0.0.${{ github.run_number }}" }
+          $iscc = (Get-Command iscc -ErrorAction SilentlyContinue).Source
+          if (-not $iscc) { $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" }
+          if (-not (Test-Path $iscc)) { choco install innosetup -y --no-progress; $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" }
+          & $iscc "/DAppVersion=$ver" packaging\installer.iss
+          if ($LASTEXITCODE -ne 0) { throw "Inno Setup hatası" }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DnDVoiceChanger_Setup
+          path: voice-changer/dist/DnDVoiceChanger_Setup_*.exe
+      - name: Ön sürüm olarak yayınla
+        if: github.ref_type == 'tag'
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Ses Değiştirici ${{ github.ref_name }}
+          prerelease: true
+          make_latest: false
+          files: voice-changer/dist/DnDVoiceChanger_Setup_*.exe
